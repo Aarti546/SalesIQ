@@ -1,2 +1,0 @@
-rows_after_cleaning,columns_after_cleaning,exact_duplicate_rows_removed,repeated_order_id_rows_kept,invalid_or_missing_dates,missing_amount_targets,data_sheet
-65000,27,0,4253,0,3914,Amazon India Sales Data

@@ -1,3 +1,0 @@
-model,MAE,MSE,RMSE,R2,train_rows,test_rows,split
-Linear Regression,139.17472255189776,40263.91222187688,200.65869585412162,0.48617140274239745,48852,12234,"GroupShuffleSplit by Order ID, test_size=0.20, random_state=42"
-Random Forest Regressor,144.43790219144708,42786.16749279132,206.84817498056714,0.4539835994152436,48852,12234,"GroupShuffleSplit by Order ID, test_size=0.20, random_state=42"
