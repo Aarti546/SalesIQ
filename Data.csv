@@ -1,0 +1,169 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex a972814..ff9eee1 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -1,93 +1,71 @@[m
+[31m-[m
+[31m-# 📊 Amazon Sales Data Analysis Project[m
+[31m-[m
+[31m-## 📌 Project Overview[m
+[31m-[m
+[31m-This project focuses on analyzing Amazon sales data using Python. It includes data visualization, statistical analysis, and a machine learning model to predict sales amount.[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 🎯 Objectives[m
+[31m-[m
+[31m-* Analyze sales trends across different time periods[m
+[31m-* Compare performance across product categories and regions[m
+[31m-* Identify factors affecting sales[m
+[31m-* Build a prediction model using Linear Regression[m
+[31m-* Perform hypothesis testing for business insights[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 🛠️ Technologies Used[m
+[31m-[m
+[31m-* Python[m
+[31m-* Pandas, NumPy[m
+[31m-* Matplotlib, Seaborn[m
+[31m-* Scikit-learn[m
+[31m-* SciPy[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 📊 Features[m
+[31m-[m
+[31m-* Data analysis and insights[m
+[31m-* Bright and colorful visualizations[m
+[31m-* Correlation analysis[m
+[31m-* Sales prediction using Linear Regression[m
+[31m-* Hypothesis testing (t-test, chi-square, Shapiro test)[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 📁 Dataset[m
+[31m-[m
+[31m-The dataset is provided in Excel format and included in this repository.[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## ▶️ How to Run[m
+[31m-[m
+[31m-1. Clone or download this repository[m
+[31m-2. Install required libraries:[m
+[31m-   pip install -r requirements.txt[m
+[31m-3. Run the Python file:[m
+[31m-   python main.py[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 📷 Output Screenshots[m
+[31m-### 📊 Sales Distribution[m
+[31m-![Sales Distribution](images/chart1.png)[m
+[31m-[m
+[31m-### 📊 Category-wise Sales[m
+[31m-![Category Sales](images/chart2.png)[m
+[31m-[m
+[31m-### 📊 Monthly Sales Trend[m
+[31m-![Monthly Trend](images/chart3.png)[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 📈 Results[m
+[31m-[m
+[31m-* Identified top-performing categories and states[m
+[31m-* Observed patterns in monthly sales trends[m
+[31m-* Built a regression model to predict sales[m
+[31m-* Statistical tests validated key business insights[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 💡 Conclusion[m
+[31m-[m
+[31m-This project demonstrates how data analysis and machine learning can be used to understand business performance and predict future sales trends.[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-## 🚀 Future Improvements[m
+[31m-[m
+[31m-* Add interactive dashboard (Power BI / Streamlit)[m
+[31m-* Use advanced machine learning models[m
+[31m-* Deploy as a web application[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m----[m
+[31m-[m
+[31m-⭐ If you like this project, give it a star![m
+[32m+[m[32m# SalesIQ — Sales Intelligence and Prediction[m
+[32m+[m
+[32m+[m[32mSalesIQ analyzes Amazon India sales from March–May 2022 and compares machine[m
+[32m+[m[32mlearning models for order-amount regression and cancellation classification.[m
+[32m+[m[32mThe project is a single Python script that can be run from Spyder/Anaconda on[m
+[32m+[m[32mWindows or from a terminal.[m
+[32m+[m
+[32m+[m[32m## Project files[m
+[32m+[m
+[32m+[m[32m- `main.py` — data cleaning, EDA, model training, evaluation, and output saving.[m
+[32m+[m[32m- `Amazon India Sales DataExcel.xlsx` — the original workbook; it is not modified.[m
+[32m+[m[32m- `requirements.txt` — Python packages used by the script.[m
+[32m+[m[32m- `images/` — charts already present in the repository; these are preserved.[m
+[32m+[m[32m- `outputs/` — generated charts and CSV evaluation/analysis tables.[m
+[32m+[m
+[32m+[m[32mThe script reads the **Amazon India Sales Data** worksheet, not the workbook's[m
+[32m+[m[32mpivot/summary sheets. It uses the named columns in that worksheet and ignores[m
+[32m+[m[32munheaded helper columns.[m
+[32m+[m
+[32m+[m[32m## Setup and run[m
+[32m+[m
+[32m+[m[32mKeep the Excel workbook in the same folder as `main.py`. In Anaconda Prompt,[m
+[32m+[m[32minstall the dependencies and run the script:[m
+[32m+[m
+[32m+[m[32m```text[m
+[32m+[m[32mpip install -r requirements.txt[m
+[32m+[m[32mpython main.py[m
+[32m+[m[32m```[m
+[32m+[m
+[32m+[m[32mIn Spyder, open `main.py`, select the project folder as the working directory,[m
+[32m+[m[32mand run the file. The script also resolves the workbook relative to its own[m
+[32m+[m[32mlocation, so its data path does not depend on a user-specific Windows path.[m
+[32m+[m
+[32m+[m[32m## Analysis[m
+[32m+[m
+[32m+[m[32mThe script reports data shape, missing values, exact duplicate rows, repeated[m
+[32m+[m[32morder IDs, and unparseable dates. Repeated order IDs are retained because an[m
+[32m+[m[32morder can contain multiple line items. Missing feature values are imputed[m
+[32m+[m[32minside model pipelines; missing `Amount` targets are excluded from regression[m
+[32m+[m[32mrather than being filled with invented target values.[m
+[32m+[m
+[32m+[m[32mEDA includes descriptive statistics, category-wise sales, monthly trends,[m
+[32m+[m[32mstate-wise sales, numeric correlations, order-status counts, and overall and[m
+[32m+[m[32mcategory-level cancellation rates where the corresponding columns are present.[m
+[32m+[m
+[32m+[m[32mRegression models predict `Amount` with Linear Regression and Random Forest[m
+[32m+[m[32mRegressor. They are evaluated with MAE, MSE, RMSE, and R².[m
+[32m+[m
+[32m+[m[32mCancellation classification uses `Status == "Cancelled"` as its binary target.[m
+[32m+[m[32mIt runs Logistic Regression, Decision Tree Classifier, and Random Forest[m
+[32m+[m[32mClassifier only when both target classes are present. It reports confusion[m
+[32m+[m[32mmatrices, accuracy, precision, recall, F1, ROC-AUC, and log loss. The inspected[m
+[32m+[m[32mworkbook has both cancelled and non-cancelled statuses, so this target is[m
+[32m+[m[32msupported.[m
+[32m+[m
+[32m+[m[32mBoth tasks use a reproducible 80/20 `GroupShuffleSplit` by `Order ID`, keeping[m
+[32m+[m[32mall line items for an order on the same side of the split. This prevents rows[m
+[32m+[m[32mfrom the same order appearing in both training and test sets. Preprocessing[m
+[32m+[m[32m(median imputation, most-frequent categorical imputation, scaling, and[m
+[32m+[m[32mone-hot encoding) is fitted within each model pipeline using training data[m
+[32m+[m[32monly. For cancellation prediction, fields that can reveal the outcome,[m
+[32m+[m[32mincluding quantity, amount, modified amount, status-group fields, and shipping[m
+[32m+[m[32moutcomes, are not used as predictors.[m
+[32m+[m
+[32m+[m[32m## Generated outputs[m
+[32m+[m
+[32m+[m[32mThe script creates `outputs/` when it runs. It saves descriptive statistics,[m
+[32m+[m[32mdata quality details, EDA tables and charts, regression metrics, classification[m
+[32m+[m[32mmetrics, per-model confusion matrices, and an ROC-curve chart when applicable.[m
+[32m+[m[32mThe output files are local analysis artifacts; running the script does not[m
+[32m+[m[32mcommit or upload anything.[m

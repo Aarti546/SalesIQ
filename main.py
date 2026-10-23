@@ -105,19 +105,7 @@ print(classification_df["is_cancelled"].value_counts())
 print("\nMissing values in regression dataset:")
 print(regression_df.isnull().sum())
 
-# SAVE CLEANED DATASETS
 
-df.to_csv("salesiq_cleaned.csv", index=False)
-
-regression_df.to_csv(
-    "salesiq_regression_data.csv",
-    index=False
-)
-
-classification_df.to_csv(
-    "salesiq_classification_data.csv",
-    index=False
-)
 
 print("\nCleaned datasets saved successfully!")
 #--------------------------------------cleaning done
@@ -219,56 +207,94 @@ plt.ylabel("Number of Records")
 plt.show()
 
 
+#-----------------MODALS----------------
+# 1.LINEAR REGRESSION: Predicting Sales Amount
 
-# 6. LINEAR REGRESSION MODEL (Predicting Sales Amount)
-# Select features (adjust if needed)
-features = ['qty']  # you can add more columns if available
+# Select input feature and target
+X = regression_df[['qty']]
+y = regression_df['amount']
 
-X = df[features]
-y = df['amount']
+print("Input features shape:", X.shape)
+print("Target shape:", y.shape)
 
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+print("\nMissing values in X:")
+print(X.isnull().sum())
 
-df['amount'] = df['amount'].fillna(df['amount'].median())
-# Model
+print("\nMissing values in y:")
+print(y.isnull().sum())
+
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+print("Training data:", X_train.shape)
+print("Testing data:", X_test.shape)
+
+
+# Create the Linear Regression model
 model = LinearRegression()
+
+# Train the model
 model.fit(X_train, y_train)
 
-# Prediction
+print("Linear Regression model trained successfully!")
+print("Coefficient:", model.coef_[0])
+print("Intercept:", model.intercept_)
+
+# Predict sales amount on test data
 y_pred = model.predict(X_test)
 
-# Evaluation
-print("MAE:", mean_absolute_error(y_test, y_pred))
-print("R2 Score:", r2_score(y_test, y_pred))
+print("First 10 actual values:")
+print(y_test.head(10).values)
 
-#Prediction Visualization
-plt.figure(figsize=(6,6))
-plt.scatter(y_test, y_pred, color='green')
-plt.xlabel("Actual")
-plt.ylabel("Predicted")
-plt.title("Actual vs Predicted Sales")
+print("\nFirst 10 predicted values:")
+print(y_pred[:10])
+
+# Evaluate the model
+mae = mean_absolute_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("Mean Absolute Error (MAE):", round(mae, 2))
+print("R2 Score:", round(r2, 4))
+
+
+print("Quantity distribution:")
+print(regression_df['qty'].value_counts().sort_index())
+
+print("\nNumber of unique quantity values:")
+print(regression_df['qty'].nunique())
+
+
+# Actual vs Predicted Sales Visualization
+plt.figure(figsize=(7, 5))
+
+plt.scatter(
+    y_test, y_pred,
+    alpha=0.4,
+    color='green'
+)
+
+# Reference line for perfect predictions
+min_val = min(y_test.min(), y_pred.min())
+max_val = max(y_test.max(), y_pred.max())
+
+plt.plot(
+    [min_val, max_val],
+    [min_val, max_val],
+    color='red',
+    linestyle='--',
+    label='Perfect Prediction'
+)
+
+plt.xlabel("Actual Sales Amount")
+plt.ylabel("Predicted Sales Amount")
+plt.title("Linear Regression: Actual vs Predicted Sales")
+plt.legend()
 plt.show()
 
-#HYPOTHESIS TESTING
-# 1. T-Test (B2B vs B2C Sales)
-if 'B2B' in df.columns:
-    group1 = df[df['B2B'] == True]['Amount']
-    group2 = df[df['B2B'] == False]['Amount']
 
-    t_stat, p_val = stats.ttest_ind(group1, group2, nan_policy='omit')
 
-    print("T-test p-value:", p_val)
-    
-# 2. Chi-Square Test (Category vs Status)
-if 'Category' in df.columns and 'Status' in df.columns:
-    contingency = pd.crosstab(df['Category'], df['Status'])
-
-    chi2, p, dof, expected = stats.chi2_contingency(contingency)
-
-    print("Chi-square p-value:", p)
-    
-    
-# 3. Normality Test (Shapiro Test)
-stat, p = stats.shapiro(df['Amount'].sample(500))
-print("Shapiro Test p-value:", p)
