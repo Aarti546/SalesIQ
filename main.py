@@ -6,7 +6,17 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import mean_absolute_error, r2_score, classification_report, confusion_matrix
-
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    confusion_matrix,
+    classification_report
+)
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 df = pd.read_csv("C:/Users/Udit ComputerS/Desktop/SalesIQ/Amazon India Sales Data.csv")
 
@@ -296,5 +306,320 @@ plt.title("Linear Regression: Actual vs Predicted Sales")
 plt.legend()
 plt.show()
 
+# MODEL 2: RANDOM FOREST REGRESSOR
+
+X = regression_df[['qty']]
+y = regression_df['amount']
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+print("Training data:", X_train.shape)
+print("Testing data:", X_test.shape)
+
+# Train the model
+rf_reg = RandomForestRegressor(
+    n_estimators=100,
+    random_state=42
+)
+
+rf_reg.fit(X_train, y_train)
+
+print("Random Forest Regressor trained successfully!")
+# Predictions
+y_pred_rf = rf_reg.predict(X_test)
+
+print("First 10 actual values:")
+print(y_test.head(10).values)
+
+print("\nFirst 10 predicted values:")
+print(y_pred_rf[:10])
+
+# Evaluate the model
+mae_rf = mean_absolute_error(y_test, y_pred_rf)
+r2_rf = r2_score(y_test, y_pred_rf)
+
+print("Random Forest Regressor Results")
+print("MAE:", round(mae_rf, 2))
+print("R2 Score:", round(r2_rf, 4))
+
+# Visualize the model
+plt.figure(figsize=(7, 5))
+
+plt.scatter(y_test, y_pred_rf, alpha=0.4, color='purple')
+
+plt.xlabel("Actual Sales Amount")
+plt.ylabel("Predicted Sales Amount")
+plt.title("Random Forest Regressor: Actual vs Predicted Sales")
+
+plt.show()
 
 
+
+
+# MODEL 3: LOGISTIC REGRESSION
+
+# Select input features
+features = [
+    'qty',
+    'category',
+    'size',
+    'fulfilment',
+    'ship_service_level',
+    'b2b'
+]
+
+X = classification_df[features].copy()
+y = classification_df['is_cancelled'].copy()
+
+print("Input data shape:", X.shape)
+print("Target data shape:", y.shape)
+
+print("\nCancellation distribution:")
+print(y.value_counts())
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+# Convert categorical features into numerical columns
+categorical_columns = [
+    'category',
+    'size',
+    'fulfilment',
+    'ship_service_level',
+    'b2b'
+]
+
+X_train_encoded = pd.get_dummies(
+    X_train,
+    columns=categorical_columns,
+    dtype=int
+)
+
+X_test_encoded = pd.get_dummies(
+    X_test,
+    columns=categorical_columns,
+    dtype=int
+)
+
+# Ensure both datasets have the same columns
+X_test_encoded = X_test_encoded.reindex(
+    columns=X_train_encoded.columns,
+    fill_value=0
+)
+
+print("Training data:", X_train_encoded.shape)
+print("Testing data:", X_test_encoded.shape)
+# Train the model
+clf = LogisticRegression(max_iter=1000, random_state=42)
+
+clf.fit(X_train_encoded, y_train)
+
+print("Logistic Regression model trained successfully!")
+# Predictions
+y_pred = clf.predict(X_test_encoded)
+
+print("First 20 actual values:")
+print(y_test.head(20).values)
+
+print("\nFirst 20 predicted values:")
+print(y_pred[:20])
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+
+precision = precision_score(
+    y_test, y_pred, zero_division=0
+)
+
+recall = recall_score(
+    y_test, y_pred, zero_division=0
+)
+
+print("\nLOGISTIC REGRESSION RESULTS")
+print(f"Accuracy:  {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall:    {recall:.4f}")
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+
+print("\nConfusion Matrix:")
+print(cm)
+
+# Detailed classification report
+print("\nClassification Report:")
+print(classification_report(
+    y_test, y_pred,
+    zero_division=0
+))
+# Visualize Confusion Matrix
+plt.figure(figsize=(6, 5))
+
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt='d',
+    cmap='Blues',
+    xticklabels=['Not Cancelled', 'Cancelled'],
+    yticklabels=['Not Cancelled', 'Cancelled']
+)
+
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Logistic Regression - Confusion Matrix")
+plt.show()
+
+# MODEL 4: DECISION TREE CLASSIFIER
+# ==========================================
+
+# Train the model
+dt_clf = DecisionTreeClassifier(
+    criterion='entropy',
+    max_depth=3,
+    random_state=42
+)
+
+dt_clf.fit(X_train_encoded, y_train)
+
+print("Decision Tree Classifier trained successfully!")
+# Predictions
+y_pred_dt = dt_clf.predict(X_test_encoded)
+
+print("First 20 actual values:")
+print(y_test.head(20).values)
+
+print("\nFirst 20 predicted values:")
+print(y_pred_dt[:20])
+# Evaluate the model
+accuracy_dt = accuracy_score(y_test, y_pred_dt)
+
+precision_dt = precision_score(
+    y_test, y_pred_dt, zero_division=0
+)
+
+recall_dt = recall_score(
+    y_test, y_pred_dt, zero_division=0
+)
+
+print("\nDECISION TREE CLASSIFIER RESULTS")
+print(f"Accuracy:  {accuracy_dt:.4f}")
+print(f"Precision: {precision_dt:.4f}")
+print(f"Recall:    {recall_dt:.4f}")
+
+# Confusion Matrix
+cm_dt = confusion_matrix(y_test, y_pred_dt)
+
+print("\nConfusion Matrix:")
+print(cm_dt)
+
+print("\nClassification Report:")
+print(classification_report(
+    y_test, y_pred_dt, zero_division=0
+))
+# Visualize the Decision Tree
+plt.figure(figsize=(20, 10))
+
+plot_tree(
+    dt_clf,
+    feature_names=X_train_encoded.columns,
+    class_names=['Not Cancelled', 'Cancelled'],
+    filled=True,
+    rounded=True,
+    fontsize=8
+)
+
+plt.title("Decision Tree for SalesIQ Order Cancellation")
+plt.show()
+# Visualize Confusion Matrix
+plt.figure(figsize=(6, 5))
+
+sns.heatmap(
+    cm_dt,
+    annot=True,
+    fmt='d',
+    cmap='Greens',
+    xticklabels=['Not Cancelled', 'Cancelled'],
+    yticklabels=['Not Cancelled', 'Cancelled']
+)
+
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Decision Tree - Confusion Matrix")
+plt.show()
+
+# MODEL 5: KNN CLASSIFIER
+
+print("Training data shape:", X_train_encoded.shape)
+print("Testing data shape:", X_test_encoded.shape)
+# Feature scaling
+scaler = StandardScaler()
+
+X_train_scaled = scaler.fit_transform(X_train_encoded)
+X_test_scaled = scaler.transform(X_test_encoded)
+
+print("Feature scaling completed!")
+# Train the model
+knn = KNeighborsClassifier(n_neighbors=5)
+
+knn.fit(X_train_scaled, y_train)
+
+print("KNN Classifier trained successfully!")
+# Predictions
+y_pred_knn = knn.predict(X_test_scaled)
+
+print("First 20 actual values:")
+print(y_test.head(20).values)
+
+print("\nFirst 20 predicted values:")
+print(y_pred_knn[:20])
+# Evaluate the model
+accuracy_knn = accuracy_score(y_test, y_pred_knn)
+
+precision_knn = precision_score(
+    y_test, y_pred_knn, zero_division=0
+)
+
+recall_knn = recall_score(
+    y_test, y_pred_knn, zero_division=0
+)
+
+print("\nKNN CLASSIFIER RESULTS")
+print(f"Accuracy:  {accuracy_knn:.4f}")
+print(f"Precision: {precision_knn:.4f}")
+print(f"Recall:    {recall_knn:.4f}")
+
+# Confusion Matrix
+cm_knn = confusion_matrix(y_test, y_pred_knn)
+
+print("\nConfusion Matrix:")
+print(cm_knn)
+
+print("\nClassification Report:")
+print(classification_report(
+    y_test, y_pred_knn, zero_division=0
+))
+# Visualize Confusion Matrix
+plt.figure(figsize=(6, 5))
+
+sns.heatmap(
+    cm_knn,
+    annot=True,
+    fmt='d',
+    cmap='Purples',
+    xticklabels=['Not Cancelled', 'Cancelled'],
+    yticklabels=['Not Cancelled', 'Cancelled']
+)
+
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("KNN Classifier - Confusion Matrix")
+plt.show()
