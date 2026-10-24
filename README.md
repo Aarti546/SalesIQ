@@ -1,71 +1,90 @@
 # SalesIQ — Sales Intelligence and Prediction
 
-SalesIQ analyzes Amazon India sales from March–May 2022 and compares machine
-learning models for order-amount regression and cancellation classification.
-The project is a single Python script that can be run from Spyder/Anaconda on
-Windows or from a terminal.
+SalesIQ is a machine learning project that analyzes Amazon India sales data and evaluates models for sales amount prediction and order cancellation classification.
 
-## Project files
+## Project Objectives
 
-- `main.py` — data cleaning, EDA, model training, evaluation, and output saving.
-- `Amazon India Sales DataExcel.xlsx` — the original workbook; it is not modified.
-- `requirements.txt` — Python packages used by the script.
-- `images/` — charts already present in the repository; these are preserved.
-- `outputs/` — generated charts and CSV evaluation/analysis tables.
+- Clean and preprocess sales data.
+- Explore sales patterns through visualizations.
+- Predict sales amount using regression models.
+- Classify orders as cancelled or not cancelled.
+- Compare machine learning models using appropriate evaluation metrics.
 
-The script reads the **Amazon India Sales Data** worksheet, not the workbook's
-pivot/summary sheets. It uses the named columns in that worksheet and ignores
-unheaded helper columns.
+## Dataset
 
-## Setup and run
+- **Dataset:** Amazon India Sales Data
+- **Period:** March–May 2022
+- **Original records:** Approximately 65,000
+- **Regression target:** `amount`
+- **Classification target:** `is_cancelled`
 
-Keep the Excel workbook in the same folder as `main.py`. In Anaconda Prompt,
-install the dependencies and run the script:
+The `is_cancelled` target is derived from the order status. The original `status` column is excluded from classification features to avoid target leakage.
 
-```text
-pip install -r requirements.txt
-python main.py
+## Data Preprocessing and EDA
+
+The project includes column-name standardization, numeric conversion, removal of unnecessary columns, handling of missing values, and preparation of separate datasets for regression and classification.
+
+Exploratory data analysis includes sales amount distribution, category-wise sales, monthly sales trends, a correlation heatmap, top states by sales, fulfilment analysis, and cancellation counts.
+
+## Machine Learning Models
+
+### Regression
+
+1. Linear Regression
+2. Random Forest Regressor
+
+Both models use `qty` as the input feature and `amount` as the target.
+
+| Model | MAE | R² Score |
+|---|---:|---:|
+| Linear Regression | 212.9430 | 0.0114 |
+| Random Forest Regressor | 211.8403 | 0.0355 |
+
+**Finding:** Random Forest Regressor performs slightly better on both metrics. However, both models have low R² scores, indicating that quantity alone is insufficient to explain sales amount variation.
+
+### Classification
+
+1. Logistic Regression
+2. Decision Tree Classifier
+3. K-Nearest Neighbors (KNN)
+
+The target is `is_cancelled`. The features include quantity, category, size, fulfilment, shipping service level, and B2B status. The classification evaluation uses a stratified 80/20 train-test split.
+
+| Model | Accuracy | Precision | Recall | F1-score |
+|---|---:|---:|---:|---:|
+| Logistic Regression | 0.9568 | 0.9953 | 0.6975 | 0.8202 |
+| Decision Tree | 0.9568 | 0.9953 | 0.6975 | 0.8202 |
+| KNN | 0.9559 | 0.9937 | 0.6921 | 0.8159 |
+
+**Finding:** Logistic Regression and Decision Tree tie on the reported metrics. KNN performs slightly worse. Although precision is high, recall is approximately 69–70%, meaning some cancelled orders are missed.
+
+## Final Conclusion
+
+Among the tested regression models, Random Forest Regressor performs best, although its predictive power is limited with the current feature selection. For cancellation classification, Logistic Regression and Decision Tree produce identical predictions on the test set and tie on the reported metrics.
+
+The project demonstrates data preprocessing, exploratory analysis, regression, classification, and model evaluation. Future improvements could include additional relevant features, feature engineering, and further evaluation.
+
+## Technologies Used
+
+- Python
+- Pandas and NumPy
+- Matplotlib and Seaborn
+- Scikit-learn
+- Git and GitHub
+
+## How to Run
+
+1. Clone or download this repository.
+2. Install the required Python packages.
+3. Ensure the dataset is available at the path used in the script, or update the path.
+4. Run the main Python file.
+
+Install dependencies with:
+
+```bash
+pip install pandas numpy matplotlib seaborn scikit-learn
 ```
 
-In Spyder, open `main.py`, select the project folder as the working directory,
-and run the file. The script also resolves the workbook relative to its own
-location, so its data path does not depend on a user-specific Windows path.
+## Project Status
 
-## Analysis
-
-The script reports data shape, missing values, exact duplicate rows, repeated
-order IDs, and unparseable dates. Repeated order IDs are retained because an
-order can contain multiple line items. Missing feature values are imputed
-inside model pipelines; missing `Amount` targets are excluded from regression
-rather than being filled with invented target values.
-
-EDA includes descriptive statistics, category-wise sales, monthly trends,
-state-wise sales, numeric correlations, order-status counts, and overall and
-category-level cancellation rates where the corresponding columns are present.
-
-Regression models predict `Amount` with Linear Regression and Random Forest
-Regressor. They are evaluated with MAE, MSE, RMSE, and R².
-
-Cancellation classification uses `Status == "Cancelled"` as its binary target.
-It runs Logistic Regression, Decision Tree Classifier, and Random Forest
-Classifier only when both target classes are present. It reports confusion
-matrices, accuracy, precision, recall, F1, ROC-AUC, and log loss. The inspected
-workbook has both cancelled and non-cancelled statuses, so this target is
-supported.
-
-Both tasks use a reproducible 80/20 `GroupShuffleSplit` by `Order ID`, keeping
-all line items for an order on the same side of the split. This prevents rows
-from the same order appearing in both training and test sets. Preprocessing
-(median imputation, most-frequent categorical imputation, scaling, and
-one-hot encoding) is fitted within each model pipeline using training data
-only. For cancellation prediction, fields that can reveal the outcome,
-including quantity, amount, modified amount, status-group fields, and shipping
-outcomes, are not used as predictors.
-
-## Generated outputs
-
-The script creates `outputs/` when it runs. It saves descriptive statistics,
-data quality details, EDA tables and charts, regression metrics, classification
-metrics, per-model confusion matrices, and an ROC-curve chart when applicable.
-The output files are local analysis artifacts; running the script does not
-commit or upload anything.
+The five planned machine learning models and the final model comparison have been implemented. The project documents the observed results and limitations of the current feature selection.

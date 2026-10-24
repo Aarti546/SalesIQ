@@ -9,11 +9,15 @@ from sklearn.metrics import mean_absolute_error, r2_score, classification_report
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
     recall_score,
     confusion_matrix,
+    f1_score,
     classification_report
 )
 from sklearn.tree import DecisionTreeClassifier, plot_tree
@@ -31,13 +35,12 @@ print(df.info())
 print(df.describe())
 print(df.isnull().sum())
 
-# DATA CLEANING
+# DATA CLEANING-------------------------
 # 1. Fix column names 
 df.columns = df.columns.str.strip().str.lower()
 # 2. Replace spaces and hyphens with underscores
 df.columns = df.columns.str.replace(" ", "_")
 df.columns = df.columns.str.replace("-", "_")
-
 
 
 #Ensure Amount is numeric
@@ -87,7 +90,7 @@ df["ship_service_level"] = df["ship_service_level"].fillna("Unknown")
 df["category"] = df["category"].fillna("Unknown")
 df["size"] = df["size"].fillna("Unknown")
 
-# Keep missing amounts for now.
+# Keeping missing amounts for now.
 # Regression models will use rows where amount is available.
 
 # Create cancellation target
@@ -115,10 +118,9 @@ print(classification_df["is_cancelled"].value_counts())
 print("\nMissing values in regression dataset:")
 print(regression_df.isnull().sum())
 
-
-
 print("\nCleaned datasets saved successfully!")
 #--------------------------------------cleaning done
+
 #--------------------------EDA-------------------
 print("Dataset shape:", df.shape)
 
@@ -135,7 +137,7 @@ print("\nCancellation percentage:")
 print(round(df["is_cancelled"].mean() * 100, 2), "%")
 
 
-# 1. EDA-Statistical Summary
+#  EDA-Statistical Summary
 print("Dataset shape:", df.shape)
 print("\nMissing values:\n", df.isnull().sum())
 print("\nSummary statistics:\n", df.describe())
@@ -218,7 +220,7 @@ plt.show()
 
 
 #-----------------MODALS----------------
-# 1.LINEAR REGRESSION: Predicting Sales Amount
+# 1.LINEAR REGRESSION: Predicting Sales Amount--------------------
 
 # Select input feature and target
 X = regression_df[['qty']]
@@ -306,7 +308,7 @@ plt.title("Linear Regression: Actual vs Predicted Sales")
 plt.legend()
 plt.show()
 
-# MODEL 2: RANDOM FOREST REGRESSOR
+# MODEL 2: RANDOM FOREST REGRESSOR--------------------------------
 
 X = regression_df[['qty']]
 y = regression_df['amount']
@@ -361,7 +363,7 @@ plt.show()
 
 
 
-# MODEL 3: LOGISTIC REGRESSION
+# MODEL 3: LOGISTIC REGRESSION------------------------
 
 # Select input features
 features = [
@@ -478,8 +480,7 @@ plt.ylabel("Actual")
 plt.title("Logistic Regression - Confusion Matrix")
 plt.show()
 
-# MODEL 4: DECISION TREE CLASSIFIER
-# ==========================================
+# MODEL 4: DECISION TREE CLASSIFIER-----------------------
 
 # Train the model
 dt_clf = DecisionTreeClassifier(
@@ -556,7 +557,7 @@ plt.ylabel("Actual")
 plt.title("Decision Tree - Confusion Matrix")
 plt.show()
 
-# MODEL 5: KNN CLASSIFIER
+# MODEL 5: KNN CLASSIFIER----------------------
 
 print("Training data shape:", X_train_encoded.shape)
 print("Testing data shape:", X_test_encoded.shape)
@@ -622,4 +623,96 @@ sns.heatmap(
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("KNN Classifier - Confusion Matrix")
+plt.show()
+
+# FINAL COMPARISON - REGRESSION MODELS-------------------
+
+# Recreate Linear Regression predictions
+
+X_reg = regression_df[['qty']]
+y_reg = regression_df['amount']
+
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(
+    X_reg, y_reg,
+    test_size=0.2,
+    random_state=42
+)
+
+# Train Linear Regression again
+lr_model = LinearRegression()
+lr_model.fit(X_train_reg, y_train_reg)
+
+# Save predictions in a separate variable
+y_pred_lr = lr_model.predict(X_test_reg)
+
+print("Actual values:", len(y_test_reg))
+print("Linear Regression predictions:", len(y_pred_lr))
+print("Random Forest predictions:", len(y_pred_rf))
+# COMPARISON - REGRESSION MODELS
+
+regression_comparison = pd.DataFrame({
+    "Model": ["Linear Regression", "Random Forest Regressor"],
+    "MAE": [
+        mean_absolute_error(y_test_reg, y_pred_lr),
+        mean_absolute_error(y_test_reg, y_pred_rf)
+    ],
+    "R2 Score": [
+        r2_score(y_test_reg, y_pred_lr),
+        r2_score(y_test_reg, y_pred_rf)
+    ]
+})
+
+print("\nREGRESSION MODEL COMPARISON")
+print(regression_comparison.round(4).to_string(index=False))
+
+best_regression = regression_comparison.loc[
+    regression_comparison["MAE"].idxmin(), "Model"
+]
+
+print("\nBest regression model based on MAE:", best_regression)
+
+# FINAL COMPARISON - CLASSIFICATION MODELS----------------------
+
+classification_comparison = pd.DataFrame({
+    "Model": [
+        "Logistic Regression",
+        "Decision Tree",
+        "KNN"
+    ],
+    "Accuracy": [
+        accuracy_score(y_test, y_pred),
+        accuracy_score(y_test, y_pred_dt),
+        accuracy_score(y_test, y_pred_knn)
+    ],
+    "Precision": [
+        precision_score(y_test, y_pred, zero_division=0),
+        precision_score(y_test, y_pred_dt, zero_division=0),
+        precision_score(y_test, y_pred_knn, zero_division=0)
+    ],
+    "Recall": [
+        recall_score(y_test, y_pred, zero_division=0),
+        recall_score(y_test, y_pred_dt, zero_division=0),
+        recall_score(y_test, y_pred_knn, zero_division=0)
+    ],
+    "F1 Score": [
+        f1_score(y_test, y_pred, zero_division=0),
+        f1_score(y_test, y_pred_dt, zero_division=0),
+        f1_score(y_test, y_pred_knn, zero_division=0)
+    ]
+})
+
+print("\nCLASSIFICATION MODEL COMPARISON")
+print(classification_comparison.round(4).to_string(index=False))
+# Classification models performance comparison
+
+classification_comparison.set_index("Model")[
+    ["Accuracy", "Precision", "Recall", "F1 Score"]
+].plot(kind="bar", figsize=(10, 6))
+
+plt.title("SalesIQ - Classification Models Comparison")
+plt.ylabel("Score")
+plt.ylim(0, 1.05)
+plt.xticks(rotation=10)
+plt.legend(loc="lower right")
+plt.tight_layout()
 plt.show()
